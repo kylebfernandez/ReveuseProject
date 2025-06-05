@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reveuse Project</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            background-color: var(--reveuse-background-light); /* Updated background */
+            color: var(--reveuse-text-primary); /* Default text color */
+        }
+
+        /* Updated Custom Colors for Reveuse Project based on Logo */
+        :root {
+            --reveuse-primary-dark-purple: #4d3a6a; /* For text, dark accents */
+            --reveuse-primary-purple: #745b98;       /* Main purple from logo */
+            --reveuse-secondary-lavender: #b49fcc;  /* Lighter purple accent from logo */
+            --reveuse-accent-pink-lavender: #e6ddee; /* Very light pink/lavender for highlights/bg */
+            --reveuse-accent-blue: #c1e0f7;        /* Soft blue accent, slightly desaturated from logo example */
+            --reveuse-background-light: #f8f4fc;     /* Very light off-white/lavender for general page background */
+            
+            --reveuse-text-primary: #3c3248; /* Darker text for general readability */
+            --reveuse-text-hero-light: #ffffff; /* Light text for hero section */
+            --reveuse-text-muted: #6e5f85;  /* Muted text color */
+
+            --reveuse-hero-overlay-start: rgba(77, 58, 106, 0.75); 
+            --reveuse-hero-overlay-mid: rgba(116, 91, 152, 0.6);  
+            --reveuse-hero-overlay-end: rgba(180, 159, 204, 0.4); 
+        }
+
+        /* Utility classes for new colors */
+        .bg-reveuse-primary-purple { background-color: var(--reveuse-primary-purple); }
+        .text-reveuse-primary-purple { color: var(--reveuse-primary-purple); }
+        .bg-reveuse-secondary-lavender { background-color: var(--reveuse-secondary-lavender); }
+        .text-reveuse-secondary-lavender { color: var(--reveuse-secondary-lavender); }
+        .bg-reveuse-accent-pink-lavender { background-color: var(--reveuse-accent-pink-lavender); }
+        .text-reveuse-accent-pink-lavender { color: var(--reveuse-accent-pink-lavender); }
+        .bg-reveuse-accent-blue { background-color: var(--reveuse-accent-blue); }
+        .text-reveuse-accent-blue { color: var(--reveuse-accent-blue); }
+        .text-reveuse-primary-dark-purple { color: var(--reveuse-primary-dark-purple); }
+        .border-reveuse-primary-purple { border-color: var(--reveuse-primary-purple); }
+        .hover-bg-reveuse-secondary-lavender:hover { background-color: var(--reveuse-secondary-lavender); }
+        .hover-text-reveuse-accent-pink-lavender:hover { color: var(--reveuse-accent-pink-lavender); }
+
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Header Styling */
+        .header-base {
+            transition: all 0.3s ease-in-out;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .header-large {
+            height: 80px;
+            background-color: rgba(248, 244, 252, 0.7); 
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .header-scrolled {
+            height: 60px;
+            background-color: rgba(230, 221, 238, 0.85); 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header-logo {
+            transition: all 0.3s ease-in-out;
+        }
+        .header-large .header-logo { width: 50px; }
+        .header-scrolled .header-logo { width: 40px; }
+
+        .nav-item {
+            position: relative;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out, color 0.3s;
+            color: var(--reveuse-text-muted);
+            white-space: nowrap; /* Prevent nav items from wrapping */
+        }
+        .nav-item:hover {
+            color: var(--reveuse-primary-purple);
+        }
+        .header-scrolled .nav-item {
+            opacity: 0.85;
+        }
+        
+        /* Hero Section Styling - Static Background */
+        #hero {
+            background-color: var(--reveuse-primary-dark-purple); /* Fallback color */
+            padding-top: 80px; /* Account for fixed header */
+            opacity: 1; /* Hero is visible by default */
+            background-image: url('https://placehold.co/1920x1080/4d3a6a/e6ddee?text=Reveuse+Dreamscape'); /* Placeholder static image */
+            background-size: cover;
+            background-position: center center;
+            /* background-attachment: fixed; /* Optional: for parallax effect */
+        }
+        .hero-overlay {
+            background: linear-gradient(135deg, var(--reveuse-hero-overlay-start), var(--reveuse-hero-overlay-mid), var(--reveuse-hero-overlay-end));
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1; 
+        }
+
+        /* Styling for sections that will fade */
+        #about, #characters, #lore, #schedule, #gallery {
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out;
+            scroll-margin-top: 90px; /* Adjust based on fixed header height + buffer */
+        }
+
+        /* Character card hover effect */
+        .character-card:hover .character-image {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        .character-image {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 3px solid var(--reveuse-accent-pink-lavender);
+        }
+
+        /* Expand/Collapse animation for character details */
+        .character-details-hidden {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, margin-top 0.5s ease-out, padding 0.5s ease-out;
+            margin-top: 0;
+            padding: 0;
+        }
+        .character-details-expanded {
+            max-height: 1000px; 
+            opacity: 1;
+            transition: max-height 0.5s ease-in, opacity 0.5s ease-in, margin-top 0.5s ease-in, padding 0.5s ease-in;
+            margin-top: 1rem; 
+            padding: 1rem; 
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 0.5rem; 
+        }
+
+        /* Section styling */
+        .content-section {
+            background-color: var(--reveuse-background-light);
+            border-radius: 0.75rem; 
+            box-shadow: 0 8px 25px rgba(77, 58, 106, 0.1); 
+        }
+        .content-section-alt {
+            background-color: #ffffff; 
+             border-radius: 0.75rem; 
+            box-shadow: 0 8px 25px rgba(77, 58, 106, 0.07);
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: var(--reveuse-primary-purple);
+            color: var(--reveuse-text-hero-light);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: var(--reveuse-secondary-lavender);
+            color: var(--reveuse-primary-dark-purple);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: var(--reveuse-accent-blue);
+            color: var(--reveuse-primary-dark-purple);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background-color: var(--reveuse-secondary-lavender);
+            transform: translateY(-2px);
+        }
+
+    </style>
+</head>
+<body class="text-reveuse-text-primary">
+    <!-- Header/Navigation Bar -->
+    <header id="main-header" class="header-base fixed w-full z-50 flex items-center justify-between px-3 sm:px-6 py-2 header-large rounded-b-xl">
+        <div class="flex items-center">
+            <img src="https://placehold.co/150x50/745b98/f8f4fc?text=Reveuse" alt="Reveuse Project Logo" class="header-logo h-auto mr-2 sm:mr-4 " onerror="this.onerror=null; this.src='https://placehold.co/150x50/745b98/f8f4fc?text=Logo';">
+            <h1 class="text-lg sm:text-2xl md:text-3xl font-bold text-reveuse-primary-dark-purple hidden md:block">Reveuse Project</h1>
+        </div>
+        <nav class="flex space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-5"> <!-- Adjusted spacing for more items -->
+            <a href="#hero" class="nav-item text-xs sm:text-sm md:text-base font-medium">Home</a>
+            <a href="#about" class="nav-item text-xs sm:text-sm md:text-base font-medium">About</a>
+            <a href="#characters" class="nav-item text-xs sm:text-sm md:text-base font-medium">Talent</a> <!-- Renamed from Characters -->
+            <a href="#schedule" class="nav-item text-xs sm:text-sm md:text-base font-medium">Schedule</a> <!-- New Nav Item -->
+            <a href="#gallery" class="nav-item text-xs sm:text-sm md:text-base font-medium">Gallery</a> <!-- New Nav Item -->
+            <a href="#lore" class="nav-item text-xs sm:text-sm md:text-base font-medium">Lore</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative h-screen flex flex-col items-center justify-center text-center text-white">
+        <!-- Static background image is now set via CSS -->
+        <div class="hero-overlay"></div> 
+        <div class="relative z-10 p-4 sm:p-8 max-w-3xl mx-auto"> 
+            <h2 class="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-6 drop-shadow-2xl leading-tight" style="color: var(--reveuse-text-hero-light);">
+                Welcome to the Reveuse Project
+            </h2>
+            <p class="text-xl sm:text-2xl font-light italic mb-10 drop-shadow-lg" style="color: var(--reveuse-accent-pink-lavender);">
+                "Where dreams unfold and destinies intertwine."
+            </p>
+            <a href="#characters" class="btn-primary px-8 py-4 sm:px-10 sm:py-4 rounded-full text-lg sm:text-xl font-semibold shadow-xl">
+                Meet the Talent
+            </a>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="container mx-auto py-16 sm:py-20 px-4 sm:px-8 my-12 sm:my-16 content-section-alt">
+        <h3 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-reveuse-primary-dark-purple">About Reveuse</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-16 items-center">
+            <div class="md:order-2">
+                <img src="https://placehold.co/600x450/b49fcc/f8f4fc?text=Enchanting+World" alt="About Reveuse" class="w-full h-auto rounded-xl shadow-lg" onerror="this.onerror=null; this.src='https://placehold.co/600x450/e0cffc/3a3a5f?text=Image Error';">
+            </div>
+            <div class="md:order-1">
+                <p class="text-base sm:text-lg leading-relaxed text-reveuse-text-muted mb-6">
+                    The Reveuse Project is a sprawling narrative universe woven with intricate lore, diverse characters, and captivating stories. It delves into themes of destiny, choice, and the profound connections that bind individuals across different realms and realities. (And it's also home to an amazing group of VTuber friends!)
+                </p>
+                <p class="text-base sm:text-lg leading-relaxed text-reveuse-text-muted">
+                    Our aim is to create an immersive experience, allowing you to explore the rich tapestry of this world, learn about its inhabitants, and uncover the secrets that lie hidden within. Join us on this grand adventure!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Talent Section (Previously Characters Section) -->
+    <section id="characters" class="container mx-auto py-16 sm:py-20 px-4 sm:px-8 my-12 sm:my-16 content-section">
+        <h3 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-reveuse-primary-dark-purple">Meet Our Talent</h3>
+        <div id="character-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+            <!-- Character Cards will be injected here by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Schedule Section (New) -->
+    <section id="schedule" class="container mx-auto py-16 sm:py-20 px-4 sm:px-8 my-12 sm:my-16 content-section-alt">
+        <h3 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-reveuse-primary-dark-purple">Stream Schedule</h3>
+        <div class="text-center text-reveuse-text-muted text-lg">
+            <p class="mb-4">Stay tuned! Our official streaming schedule will be posted here very soon.</p>
+            <p>Follow our individual social media accounts for the latest updates in the meantime!</p>
+            <!-- Placeholder for an embedded calendar or a more detailed schedule layout -->
+            <div class="mt-8 p-6 bg-reveuse-accent-pink-lavender rounded-lg shadow-inner max-w-2xl mx-auto">
+                <p class="font-semibold text-reveuse-primary-dark-purple">Example Event:</p>
+                <p>Friday, 7 PM (PST) - Group Collab Stream!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section (New) -->
+    <section id="gallery" class="container mx-auto py-16 sm:py-20 px-4 sm:px-8 my-12 sm:my-16 content-section">
+        <h3 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-reveuse-primary-dark-purple">Gallery</h3>
+        <div class="text-center text-reveuse-text-muted text-lg">
+            <p class="mb-8">Artwork, memorable moments, and creative works from our community and adventures!</p>
+            <!-- Placeholder for gallery items -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-white p-2 rounded-lg shadow-md"><img src="https://placehold.co/400x300/b49fcc/f8f4fc?text=Fan+Art+1" alt="Gallery Image 1" class="w-full h-auto rounded"></div>
+                <div class="bg-white p-2 rounded-lg shadow-md"><img src="https://placehold.co/400x300/745b98/f8f4fc?text=Stream+Highlight" alt="Gallery Image 2" class="w-full h-auto rounded"></div>
+                <div class="bg-white p-2 rounded-lg shadow-md"><img src="https://placehold.co/400x300/e6ddee/4d3a6a?text=Group+Photo" alt="Gallery Image 3" class="w-full h-auto rounded"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lore Section -->
+    <section id="lore" class="container mx-auto py-16 sm:py-20 px-4 sm:px-8 my-12 sm:my-16 content-section-alt">
+        <h3 class="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 text-reveuse-primary-dark-purple">Reveuse Lore</h3>
+        <div class="max-w-3xl mx-auto text-base sm:text-lg leading-relaxed text-reveuse-text-muted text-center">
+            <p class="mb-6">
+                Dive deep into the rich history, cosmology, and intricate events that shape the Reveuse universe. From ancient prophecies to modern-day conflicts, the lore is constantly evolving, revealing new facets of this complex world.
+            </p>
+            <p class="mb-10">
+                Explore the origins of the Soul Abilities, the different factions and realms, and the significant events that have impacted the lives of our characters.
+            </p>
+            <a href="https://docs.google.com/document/d/1zdFziuUKyNKKTX3tfUDXO9PNVHXkNL8K7rGQtKj6KSM/edit" target="_blank" rel="noopener noreferrer" class="btn-secondary px-8 py-3 sm:px-10 sm:py-4 rounded-full text-base sm:text-lg font-semibold shadow-md">
+                Read the Full Lore Document
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-reveuse-primary-dark-purple text-reveuse-accent-pink-lavender py-10 sm:py-12 text-center rounded-t-xl mt-12 sm:mt-16">
+        <p class="text-sm sm:text-base mb-4">&copy; 2024 Reveuse Project. All rights reserved.</p>
+        <div class="flex justify-center space-x-4 sm:space-x-6">
+            <a href="#" class="text-xs sm:text-sm hover-text-reveuse-accent-blue transition-colors duration-300">Privacy Policy</a>
+            <a href="#" class="text-xs sm:text-sm hover-text-reveuse-accent-blue transition-colors duration-300">Terms of Service</a>
+        </div>
+    </footer>
+
+    <script>
+        // Character Data (Sample - use your actual data)
+        const characters = [ // This data is for the #characters (Talent) section
+            { name: "Alnicchi", image: "https://placehold.co/200x200/745b98/f8f4fc?text=Alnicchi", appearance: "👻 Cyberghost", personality: "Courageous", soulAbilities: "Soul of Courage: Defiance", biography: "A former human, now a Cyberghost with an unknown status. More details to come." },
+            { name: "Amakana", image: "https://placehold.co/200x200/b49fcc/f8f4fc?text=Amakana", appearance: "👑 Regal presence", personality: "Complex, alive (dead inside).", soulAbilities: "To be revealed.", biography: "Known as Kana. Her story is unfolding." },
+            { name: "Ame Igarashi", image: "https://placehold.co/200x200/e6ddee/4d3a6a?text=Ame", appearance: "🤡 Unique style", personality: "Cool pal.", soulAbilities: "Soul of Cool pal", biography: "A Nephilim, born October 27. Many adventures await." },
+            { name: "Anuena", image: "https://placehold.co/200x200/c1e0f7/4d3a6a?text=Anuena", appearance: "🐇 Distinct features, 4'11\"", personality: "Intriguing.", soulAbilities: "Soul of Lust: Desire", biography: "Also known as Ena. Her journey is captivating." },
+             {
+                name: "Aristhea",
+                image: "https://placehold.co/200x200/745b98/f8f4fc?text=Aristhea",
+                appearance: "🐈‍⬛ Aristhea: No specific appearance provided in snippet.",
+                personality: "No specific personality provided in snippet.",
+                soulAbilities: "Soul of Wrath",
+                biography: "Aristhea, also known as Ari, is female and alive. This section would contain more details about her background, early life, current events, future, and relationships."
+            },
+            {
+                name: "CradLichen",
+                image: "https://placehold.co/200x200/b49fcc/f8f4fc?text=CradLichen",
+                appearance: "🪻 CradLichen: No specific appearance provided in snippet.",
+                personality: "No specific personality provided in snippet.",
+                soulAbilities: "Soul of Voracity: Ego",
+                biography: "CradLichen, also known as Lamia, Mia, Lams, Lichen, Cradle, is a Nyssarene, alive. Birthday: April 20, 1953 (72 years old). Height: 213 cm (6’9 ft). Occupation: Storyteller. Group Affiliation: Reveuse Project."
+            },
+            {
+                name: "Davacx",
+                image: "https://placehold.co/200x200/e6ddee/4d3a6a?text=Davacx",
+                appearance: "💸 Davacx: No specific appearance provided in snippet.",
+                personality: "No specific personality provided in snippet.",
+                soulAbilities: "Soul of Sweden: Meatballs",
+                biography: "Davacx is male, status 'Alive?'. Birthday: Febember 69. Age: 420. Hair: Neon brown. Eyes: Bubblegum pink."
+            },
+            {
+                name: "Devina Tamahoshi",
+                image: "https://placehold.co/200x200/c1e0f7/4d3a6a?text=Devina",
+                appearance: "💫 Devina Tamahoshi: Twink Wolf Femboy.",
+                personality: "Happy go lucky naive child.",
+                soulAbilities: "Soul of Love: Devina, Soul of Knowledge: Soka, Soul of Charm: Ruby, Soul of Bravery: Kim, Soul of Patience: Elaine, Soul of Perseverance: Mahy, Soul of Kindness: Deanna",
+                biography: "Devina Tamahoshi, also known as Devi, God Killer, Delivery Angel, Hypocritical Fuck (Zed), is an Agender Celestial Angel, status 'Missing'. Birthday: January 1. Age: 10,000,000,000+. Height: 135 cm (4’ 5” ft). Occupation: Soul Catcher."
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.getElementById('main-header');
+            const characterGrid = document.getElementById('character-grid');
+
+            // Handle scroll animation for the header
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) { 
+                    header.classList.remove('header-large');
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                    header.classList.add('header-large');
+                }
+            });
+
+            // Dynamically create character cards
+            if (characterGrid && characters.length > 0) {
+                characters.forEach(character => {
+                    const card = document.createElement('div');
+                    card.className = 'character-card bg-white rounded-xl shadow-lg p-5 sm:p-6 flex flex-col items-center text-center cursor-pointer transform hover:scale-105 transition-all duration-300 border-2 border-reveuse-accent-pink-lavender hover:border-reveuse-primary-purple';
+                    
+                    card.innerHTML = `
+                        <img src="${character.image}" alt="${character.name}" class="character-image w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-full mb-5 shadow-md" onerror="this.onerror=null; this.src='https://placehold.co/200x200/cccccc/969696?text=Img+Error';">
+                        <h4 class="text-xl sm:text-2xl font-semibold text-reveuse-primary-dark-purple mb-3">${character.name}</h4>
+                        <button class="toggle-details-btn btn-secondary px-4 py-2 rounded-full text-xs sm:text-sm font-medium shadow-sm mb-3">Show Details</button>
+                        <div class="character-details character-details-hidden w-full text-left text-xs sm:text-sm text-reveuse-text-muted">
+                            <p class="mb-2"><strong class="text-reveuse-primary-purple">Appearance:</strong> ${character.appearance || 'N/A'}</p>
+                            <p class="mb-2"><strong class="text-reveuse-primary-purple">Personality:</strong> ${character.personality || 'N/A'}</p>
+                            <p class="mb-2"><strong class="text-reveuse-primary-purple">Soul Abilities:</strong> ${character.soulAbilities || 'N/A'}</p>
+                            <p class="mb-2"><strong class="text-reveuse-primary-purple">Biography:</strong> ${character.biography || 'N/A'}</p>
+                        </div>
+                    `;
+                    
+                    const toggleBtn = card.querySelector('.toggle-details-btn');
+                    const detailsDiv = card.querySelector('.character-details');
+
+                    if (toggleBtn && detailsDiv) { 
+                        toggleBtn.addEventListener('click', (event) => {
+                            event.stopPropagation(); 
+                            detailsDiv.classList.toggle('character-details-hidden');
+                            detailsDiv.classList.toggle('character-details-expanded');
+                            toggleBtn.textContent = detailsDiv.classList.contains('character-details-expanded') ? 'Hide Details' : 'Show Details';
+                        });
+                    }
+                    characterGrid.appendChild(card);
+                });
+            } else {
+                if (!characterGrid) console.error("Character grid not found!");
+                if (characters.length === 0) console.warn("No characters to display.");
+            }
+
+            // Navigation link fade effect logic
+            const navLinks = document.querySelectorAll('#main-header nav a');
+            // Updated to include new sections
+            const sectionsToFade = Array.from(document.querySelectorAll('#about, #characters, #lore, #schedule, #gallery')); 
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    if (targetElement) {
+                        if (targetId === '#hero') {
+                            sectionsToFade.forEach(section => {
+                                section.style.opacity = '0';
+                            });
+                        } else {
+                            sectionsToFade.forEach(section => {
+                                if (section === targetElement) {
+                                    // Ensure a small delay for the scroll before initiating fade-in
+                                    // to make the transition smoother visually if section was far.
+                                    setTimeout(() => { section.style.opacity = '1'; }, 50); 
+                                } else {
+                                    section.style.opacity = '0';
+                                }
+                            });
+                        }
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Handle direct navigation via URL hash on page load
+            const currentHash = window.location.hash;
+            if (currentHash) {
+                const sectionToFocus = document.querySelector(currentHash);
+                if (sectionToFocus) {
+                    if (sectionsToFade.includes(sectionToFocus)) {
+                        sectionsToFade.forEach(sec => { 
+                            if (sec !== sectionToFocus) {
+                                sec.style.opacity = '0';
+                            }
+                        });
+                        // Delay fade-in slightly on load to ensure smooth scroll (if any) can complete
+                        setTimeout(() => { sectionToFocus.style.opacity = '1'; }, 100);
+                    } else if (sectionToFocus.id === 'hero') {
+                         sectionsToFade.forEach(sec => {
+                            sec.style.opacity = '0';
+                        });
+                    }
+                     // Scroll into view if a hash is present.
+                    setTimeout(() => sectionToFocus.scrollIntoView({ behavior: 'smooth' }), 0);
+                }
+            } else {
+                // If no hash, ensure only Hero is fully visible, others are initially faded out (as per CSS)
+                // No specific action needed here as CSS handles initial opacity.
+            }
+        });
+    </script>
+</body>
+</html>
